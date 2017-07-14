@@ -176,12 +176,20 @@ namespace MsgReader.Outlook
                             if (string.IsNullOrEmpty(FileName))
                                 FileName = fileTypeInfo.Description;
 
-                            FileName += "." + fileTypeInfo.Extension.ToLower();
+                            string extension;
+                            if (fileTypeInfo != null)
+                            {
+                                extension = fileTypeInfo.Extension.ToLower();
+                            } else
+                            {
+                                extension = ".dat"; //generic file type for those that can't be determined
+                            }
+                            FileName += extension;
                         }
                         else
                             _data = attachmentOle.GetStreamBytes("\u0002OlePres000");
 
-                        if (_data != null)
+                        if (_data != null && !FileName.EndsWith(".dat"))
                         {
                             try
                             {
@@ -192,8 +200,6 @@ namespace MsgReader.Outlook
                                 SaveImageAsPng(0);
                             }
                         }
-                        else
-                            throw new MRUnknownAttachmentFormat("Can not read the attachment");
 
                         OleAttachment = true;
                         IsInline = true;
